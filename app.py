@@ -1,42 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 from ai import send_message, create_new_chat
-import json
+from database import save_chat, load_chat, get_all_chats, delete_chat
 import os
 from datetime import datetime
 
 app = Flask(__name__)
-
-CHATS_DIR = 'chats'
-if not os.path.exists(CHATS_DIR):
-    os.makedirs(CHATS_DIR)
-
-def save_chat(chat_id, messages):
-    with open(f'{CHATS_DIR}/{chat_id}.json', 'w', encoding='utf-8') as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
-
-def load_chat(chat_id):
-    try:
-        with open(f'{CHATS_DIR}/{chat_id}.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-
-def get_all_chats():
-    chats = []
-    for filename in os.listdir(CHATS_DIR):
-        if filename.endswith('.json'):
-            chat_id = filename[:-5]
-            with open(f'{CHATS_DIR}/{filename}', 'r', encoding='utf-8') as f:
-                messages = json.load(f)
-                first_message = messages[0]['content'] if messages else "新对话"
-                preview = first_message[:30] + "..." if len(first_message) > 30 else first_message
-                chats.append({
-                    'id': chat_id,
-                    'preview': preview,
-                    'timestamp': os.path.getctime(f'{CHATS_DIR}/{filename}'),
-                    'date': datetime.fromtimestamp(os.path.getctime(f'{CHATS_DIR}/{filename}')).strftime('%Y-%m-%d %H:%M')
-                })
-    return sorted(chats, key=lambda x: x['timestamp'], reverse=True)
 
 @app.route('/')
 def home():
@@ -87,11 +55,9 @@ def chat(chat_id):
     return jsonify({'response': response})
 
 @app.route('/api/chat/<chat_id>', methods=['DELETE'])
-def delete_chat(chat_id):
+def delete_chat_route(chat_id):
     try:
-        file_path = f'{CHATS_DIR}/{chat_id}.json'
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        if delete_chat(chat_id):
             return jsonify({'success': True})
         return jsonify({'success': False, 'error': 'Chat not found'}), 404
     except Exception as e:
