@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with T</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <button id="showSidebar" class="float-button">
+        <i class="ri-menu-line"></i>
+    </button>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button id="newChatButton" class="primary-button">
+                    <i class="ri-add-line"></i>新对话
+                </button>
+                <button id="toggleSidebar" class="icon-only-button">
+                    <i class="ri-arrow-left-s-line"></i>
+                </button>
+            </div>
+            <div class="chat-list" id="chatList">
+                {% for chat in chats %}
+                <div class="chat-item" data-id="{{ chat.id }}">
+                    <i class="ri-message-3-line"></i>
+                    <div class="chat-content">
+                        <div class="chat-preview">{{ chat.preview }}</div>
+                        <div class="chat-date">{{ chat.date }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>Chat with T</h1>
+            </div>
+            <div class="messages" id="messages">
+                <!-- Messages will be inserted here -->
+            </div>
+            <div class="input-container">
+                <textarea id="messageInput" placeholder="输入消息..." rows="1"></textarea>
+                <button id="newlineButton" class="icon-button">
+                    <i class="ri-text-wrap"></i>
+                </button>
+                <button id="sendButton" class="primary-button">
+                    <i class="ri-send-plane-fill"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
